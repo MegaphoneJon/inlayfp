@@ -151,8 +151,9 @@ class FormProcessor extends InlayType {
       $fieldDef[$element] = $inputDef[$element];
     }
     $fieldDef['type']['name'] = $inputDef['type']->getName();
-    // All option list fields should default to a type of "Select".
-    if (is_subclass_of($inputDef['type'], '\Civi\FormProcessor\Type\OptionListInterface')) {
+    // All option list (and boolean) fields should default to a type of "Select".
+    if (is_subclass_of($inputDef['type'], '\Civi\FormProcessor\Type\OptionListInterface') ||
+    $inputDef['type']->getName() === 'Boolean') {
       $fieldDef['type']['name'] = 'Select';
     }
     // Apply modifiers.
@@ -171,16 +172,21 @@ class FormProcessor extends InlayType {
         $fieldDef['type']['name'] = 'Select';
         break;
     }
-    // Add option values if applicable
+    // Add option values if applicable.
+    // Put a blank option at the top so select lists/radios can be deselected.
+    if (in_array($fieldDef['type']['name'], ['Select', 'Radio']) && !$fieldDef['is_required']) {
+      $fieldDef['option_values'][] = [['label' => '- none -', 'value' => '']];
+    }
     if (method_exists($inputDef['type'], 'getOptions')) {
-      // Put a blank option at the top so select lists/radios can be deselected.
-      if ($fieldDef['type']['name'] !== 'Checkbox' && !$fieldDef['is_required']) {
-        $fieldDef['option_values'][] = [['label' => '- none -', 'value' => '']];
-      }
       $optionValues = $inputDef['type']->getOptions([]);
       foreach ($optionValues as $key => $optionValue) {
         $fieldDef['option_values'][] = ['label' => $optionValue, 'value' => $key];
       }
+    }
+    // Booleans are a special case.
+    if ($inputDef['type']->getName() === 'Boolean') {
+      $fieldDef['option_values'][] = ['label' => 'Yes', 'value' => 1];
+      $fieldDef['option_values'][] = ['label' => 'No', 'value' => 0];
     }
     return $fieldDef;
   }
