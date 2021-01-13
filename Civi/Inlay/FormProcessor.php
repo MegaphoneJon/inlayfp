@@ -101,8 +101,13 @@ class FormProcessor extends InlayType {
 
       if ($isGroup) {
         // new group.
-        $item = ['tag' => 'FieldGroup', 'class' => $name, 'content' => []];
+        // Handle group modifiers (to add headers).
+        if ($modifier) {
+          $stack[$ptr][] = ['tag' => 'IfpHeader', 'class' => "{$name}-header", 'content' => $name];
+          $init['fieldDefs'][$name] = ['name' => $name, 'modifier' => $modifier, 'type' => ['name' => 'header']];
+        }
         // Add this item to the current collection.
+        $item = ['tag' => 'FieldGroup', 'class' => $name, 'content' => []];
         $stack[$ptr][] = &$item;
         // Add an item to the stack itself, so our new collection is the item's fields.
         $stack[] = &$item['content'];

@@ -4,19 +4,20 @@
          :is="item.tag"
          :key="idx"
          :content="item.content"
-         :groupClass="(item.tag === 'FieldGroup') ? 'ifp-group' : 'ifp-field'"
-         ></div>
+         :groupClass="getGroupClass(item.tag)"
+         >
     </div>
   </div>
 </template>
 <script>
 
 import IfpField from './IfpField.vue';
+import IfpHeader from './IfpHeader.vue';
 
 export default {
   name: 'FieldGroup',
   props: ['content', 'groupClass'],
-  components: { IfpField},
+  components: {IfpField, IfpHeader},
   data() {
     // content is an array of items that describe other components.
     // This allows nested FieldGroup items as well as various types of form
@@ -24,6 +25,18 @@ export default {
     // crossover between types).
     return {
       fields: this.content,
+    }
+  },
+  methods: {
+    getGroupClass: function (tag) {
+      switch (tag){
+        case 'FieldGroup':
+          return 'ifp-group'
+        case 'IfpHeader':
+          return 'ifp-header';
+        default:
+          return 'ifp-field';
+      }
     }
   }
 }

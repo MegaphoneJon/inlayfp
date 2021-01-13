@@ -112,9 +112,14 @@
         }
 
         if (m[2].substr(0, 1) === '.') {
+          // Group modifiers.
+          modifierText = '';
+          if (m[3]) {
+            modifierText = ' ' + groupModifier(m[3]);
+          }
           // Start a new group.
           indent += ' ';
-          html += `<div class="group group--${m[2].substr(1)}">${m[2]}<div class="items">`;
+          html += `<div class="group group--${m[2].substr(1)}">${m[2]}${modifierText}<div class="items">`;
           stack.unshift('</div></div>');
         }
         else {
@@ -160,6 +165,22 @@
         case 'radios':
         case 'checkboxes':
           text = "(Format as radio buttons/checkboxes)";
+          break;
+        default:
+          text = '';
+      }
+      return text;
+    }
+
+    function groupModifier(modifier) {
+      switch (modifier) {
+        case 'h1':
+        case 'h2':
+        case 'h3':
+        case 'h4':
+        case 'h5':
+        case 'h6':
+          text = `(Display a section header with header level ${modifier})`;
           break;
         default:
           text = '';
