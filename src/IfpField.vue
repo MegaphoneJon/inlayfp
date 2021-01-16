@@ -55,6 +55,16 @@
         {{option.label}}</label>
       </div>
     </div>
+
+    <div v-if="inputType === 'file'" class="ifp-file">
+        <vue-base64-file-upload
+        accept="image/png,image/jpeg,image/gif,image/webp,application/pdf,text/plain,text/csv,audio/mpeg"
+        image-class="ifp-file-image"
+        input-class="ifp-file-input"
+        @size-exceeded="onFileSizeExceeded"
+        @file="onFileSelected"
+        @load="onFileUploaded" />
+    </div>
   </div>
 </template>
 <style lang="scss">
@@ -72,10 +82,12 @@
 <script>
 
 import IfpField from './IfpField.vue';
+import VueBase64FileUpload from 'vue-base64-file-upload';
 
 export default {
   // 'content' (String) form processor input name.
   props: ['content'],
+  components: {VueBase64FileUpload},
   data() {
     const d = {
       myId: this.$root.getNextId(),
@@ -97,6 +109,23 @@ export default {
       this.$root.values[this.def.name] = this.checkboxes
         .filter(option => option.selected)
         .map(option => option.value);
+    },
+    onFileSelected(file) {
+      // Form Processor expects an array with values "name", "content", and "mime_type".
+      // We get the name now, and the rest onLoad in a moment.
+      this.$root.values[this.def.name] = {};
+      this.$root.values[this.def.name].name = file.name;
+    },
+
+    onFileUploaded(dataUri) {
+      // Parse the data URL.
+      var matches = dataUri.match(/^data:(.+);base64,(.*)$/);
+      this.$root.values[this.def.name].content = matches[2];
+      this.$root.values[this.def.name].mime_type = matches[1];
+    },
+
+    onFileSizeExceeded(size) {
+      alert(`Image ${size}Mb size exceeds the 10 megabyte limit.`);
     }
   },
   computed: {
@@ -129,7 +158,7 @@ export default {
 
     },
     isInputType() {
-      return ['text','email','date','time','file','number', 'url'].includes(this.inputType);
+      return ['text','email','date','time','number', 'url'].includes(this.inputType);
     },
     label() {
       return this.def.title;

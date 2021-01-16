@@ -119,14 +119,10 @@ class FormProcessor extends InlayType {
         if (!isset($inputs[$name])) {
           continue;
         }
+        $item = ['tag' => 'IfpField', 'class' => $name, 'content' => $name];
+        $stack[$ptr][] = $item;
         // Export the field definitions, keyed by name.
         $init['fieldDefs'][$name] = $this->buildFieldDef($inputs[$name], $modifier);
-        // FIXME: Temporary hack.
-        $item = ['tag' => 'IfpField', 'class' => $name, 'content' => $name];
-        if ($init['fieldDefs'][$name]['type']['name'] == 'file') {
-          $item['tag'] = 'IfpFile';
-        }
-        $stack[$ptr][] = $item;
       }
       unset($item);
     }
