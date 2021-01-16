@@ -13,11 +13,12 @@
 
 import IfpField from './IfpField.vue';
 import IfpHeader from './IfpHeader.vue';
+import IfpFile from './IfpFile.vue';
 
 export default {
   name: 'FieldGroup',
   props: ['content', 'groupClass'],
-  components: {IfpField, IfpHeader},
+  components: {IfpField, IfpHeader, IfpFile},
   data() {
     // content is an array of items that describe other components.
     // This allows nested FieldGroup items as well as various types of form
